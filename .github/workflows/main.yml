@@ -39,8 +39,11 @@ jobs:
           node-version: lts/*
           cache: 'pnpm'
           
+      - name: Enable pnpm
+        run: corepack enable
+
       - name: Install pnpm
-        run: npm install -g pnpm
+        run: corepack prepare pnpm@latest --activate
 
       - name: install Rust stable
         uses: dtolnay/rust-toolchain@stable

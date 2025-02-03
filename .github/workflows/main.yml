@@ -14,9 +14,9 @@ jobs:
       matrix:
         include:
           - platform: 'macos-latest'
-            target: 'aarch64-apple-darwin' # Explicit target for M1 Macs
+            target: 'aarch64-apple-darwin' # Para Macs con chip M1 y superiores
           - platform: 'macos-latest'
-            target: 'x86_64-apple-darwin' # Explicit target for Intel Macs
+            target: 'x86_64-apple-darwin' # Para Macs con Intel
           - platform: 'ubuntu-22.04'
             target: ''
           - platform: 'windows-latest'
@@ -32,9 +32,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: lts/* # Use an LTS version
-          cache: 'pnpm' # Cache pnpm dependencies
-      - name: Install pnpm (Local Installation)
+          node-version: lts/* # Usa una versión LTS
+          cache: 'pnpm' # Caching de dependencias de pnpm
+      - name: Install pnpm and Add to PATH (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          npm install -g pnpm
+          echo 'export PATH="$PATH:$(npm config get prefix)/bin"' >> ~/.bash_profile
+          source ~/.bash_profile
+          echo "PATH: $PATH" # Imprime el PATH para debug
+          pnpm --version # Verifica la instalación de pnpm
+      - name: Install pnpm (Otros sistemas operativos)
+        if: matrix.platform != 'macos-latest'
         run: npm install -g pnpm
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -43,7 +52,7 @@ jobs:
         with:
           workspaces: './src-tauri -> target'
       - name: Install frontend dependencies
-        run: pnpm install # pnpm should be available in this step
+        run: pnpm install # pnpm debería estar disponible en este paso
       - uses: tauri-apps/tauri-action@v0
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -53,4 +62,4 @@ jobs:
           releaseBody: 'See the assets to download this version and install.'
           releaseDraft: true
           prerelease: false
-          args: --target ${{ matrix.target }} # Use the target from the matrix
+          args: --target ${{ matrix.target }} # Usa el target desde la matriz

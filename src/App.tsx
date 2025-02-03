@@ -28,13 +28,11 @@ function App() {
 
     // Suscribirse al evento de minimización usando `listen` del módulo de eventos.
     // El nombre del evento para la minimización puede variar; en muchos casos se usa "tauri://window-minimize".
-    const unsubMinimize = await listen(
-      "tauri://window-minimize",
-      (event: any) => {
-        // Cuando se minimice, restauramos la ventana
-        appWindow.restore();
-      }
-    );
+    const unsubMinimize = await listen("tauri://window-minimize", () => {
+      // Cuando se minimice, restauramos la ventana usando unminimize()
+      appWindow.unminimize();
+    });
+
     setMinimizeUnsub(() => unsubMinimize);
 
     // Iniciar el contador

@@ -34,17 +34,21 @@ jobs:
         with:
           node-version: lts/* # Usa una versión LTS
           cache: 'pnpm' # Caching de dependencias de pnpm
-      - name: Install pnpm and Add to PATH (macOS)
+
+      - name: Install pnpm and Add to PATH (macOS - ZSH)
         if: matrix.platform == 'macos-latest'
         run: |
           npm install -g pnpm
-          echo 'export PATH="$PATH:$(npm config get prefix)/bin"' >> ~/.bash_profile
-          source ~/.bash_profile
-          echo "PATH: $PATH" # Imprime el PATH para debug
-          pnpm --version # Verifica la instalación de pnpm
+          echo 'export PATH="$PATH:$(npm config get prefix)/bin"' >> ~/.zshrc # o ~/.zprofile
+          zsh -l -c 'source ~/.zshrc' # o ~/.zprofile
+          zsh -l -c 'echo "PATH: $PATH"' # Depuración
+          zsh -l -c 'which pnpm'       # Depuración
+          zsh -l -c 'pnpm --version'   # Verifica la instalación de pnpm
+
       - name: Install pnpm (Otros sistemas operativos)
         if: matrix.platform != 'macos-latest'
         run: npm install -g pnpm
+
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
       - name: Rust cache
